@@ -358,12 +358,25 @@ function find_items_rename_preview_experimental {
 function find_items {
   local file_pattern="$1";
   [[ -z "$file_pattern" ]] && { echo "Must specifiy a file pattern!"; return 1; }
-  find . -maxdepth 9 -regextype egrep -iregex "$file_pattern" -not -path '*/__pycache__/*' -not -path '*/bin/*' -not -path '*/obj/*' -not -path '*/.git/*' -not -path '*/.svn/*' -not -path '*/node_modules/*' -not -path '*/.ionide/*'
+  local separator="$2";
+  [[ -z "$separator" ]] && { separator='\n'; }
+  find . -maxdepth 9 -regextype egrep -iregex "$file_pattern" -not -path '*/__pycache__/*' -not -path '*/bin/*' -not -path '*/obj/*' -not -path '*/.git/*' -not -path '*/.svn/*' -not -path '*/node_modules/*' -not -path '*/.ionide/*' -print0 | tr '\0' "$separator";
 }
 
 function find_items_fuzz {
   local file_pattern="$(echo "$1" | to_fuzz)";
   find_items "$file_pattern";
+}
+
+function find_items0 {
+  local file_pattern="$1";
+  local separator='\0';
+  find_items "$file_pattern" "$separator";
+}
+
+function find_items_fuzz0 {
+  local file_pattern="$(echo "$1" | to_fuzz)";
+  find_items0 "$file_pattern";
 }
 
 function find_files_delete_preview {
